@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Online Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f9f9f9;
+        }
+        #quiz-container {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            max-width: 480px;
+            margin: auto;
+            box-shadow: 0 2px 10px #ccc;
+        }
+        .question {
+            font-weight: bold;
+        }
+        .options {
+            margin: 18px 0;
+        }
+        .options label {
+            display: block;
+            margin-top: 6px;
+        }
+        #submit-btn, #next-btn {
+            padding: 8px 18px;
+            border: none;
+            background: #308d46;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 18px;
+        }
+        #result {
+            font-size: 1.2em;
+            color: #1f4363;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <div id="quiz">
+            <!-- Quiz will be rendered here -->
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: 'What does HTML stand for?',
+                options: [
+                    'Hyper Text Markup Language',
+                    'Home Tool Markup Language',
+                    'Hyperlinks and Text Markup Language',
+                    'Hyper Tool Multi Language'
+                ],
+                answer: 0 // correct option index
+            },
+            {
+                question: 'Which language is used for styling web pages?',
+                options: [
+                    'HTML',
+                    'JQuery',
+                    'CSS',
+                    'XML'
+                ],
+                answer: 2
+            },
+           
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function renderQuestion() {
+            const quizDiv = document.getElementById('quiz');
+            if (currentQuestion < quizData.length) {
+                const q = quizData[currentQuestion];
+                let optionsHtml = '';
+                q.options.forEach((opt, index) => {
+                    optionsHtml += `<label>
+                        <input type="radio" name="option" value="${index}">
+                        ${opt}
+                    </label>`;
+                });
+
+                quizDiv.innerHTML = `
+                    <div class="question">${q.question}</div>
+                    <div class="options">${optionsHtml}</div>
+                    <button id="submit-btn">Submit</button>
+                    <div id="feedback"></div>
+                `;
+
+                document.getElementById('submit-btn').onclick = checkAnswer;
+            } else {
+                quizDiv.innerHTML = `<div id="result">Quiz Completed!<br>
+                    Your Score: ${score} / ${quizData.length}
+                </div>`;
+            }
+        }
+
+        function checkAnswer() {
+            const options = document.getElementsByName('option');
+            let selected = -1;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].checked) {
+                    selected = parseInt(options[i].value);
+                    break;
+                }
+            }
+            const feedback = document.getElementById('feedback');
+            if (selected === -1) {
+                feedback.textContent = 'Please select an option!';
+                feedback.style.color = 'red';
+                return;
+            }
+
+            const isCorrect = selected === quizData[currentQuestion].answer;
+            if (isCorrect) {
+                score++;
+                feedback.textContent = 'Correct!';
+                feedback.style.color = 'green';
+            } else {
+                feedback.textContent = 'Wrong!';
+                feedback.style.color = 'red';
+            }
+
+            // Disable all options
+            options.forEach(opt => opt.disabled = true);
+
+            // Show 'Next' button
+            document.getElementById('submit-btn').style.display = 'none';
+            const quizDiv = document.getElementById('quiz');
+            const nextBtn = document.createElement('button');
+            nextBtn.id = 'next-btn';
+            nextBtn.textContent = 'Next';
+            nextBtn.onclick = () => {
+                currentQuestion++;
+                renderQuestion();
+            };
+            quizDiv.appendChild(nextBtn);
+        }
+
+        // Initialize quiz
+        renderQuestion();
+    </script>
+</body>
+</html>
